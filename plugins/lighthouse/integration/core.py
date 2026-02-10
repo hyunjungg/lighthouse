@@ -253,7 +253,14 @@ class LighthouseCore(object):
         # background while the user is selecting which coverage files to load
         #
 
-        future = lctx.metadata.refresh_async(progress_callback=metadata_progress)
+        #
+        # NOTE:
+        #   refresh_async() is a no-op when metadata is already cached unless
+        #   force=True. This becomes problematic when the user has changed the
+        #   database layout (eg, segment edits / rebases) and then tries to
+        #   load new coverage, as stale metadata can cause mapping failures.
+        #
+        future = lctx.metadata.refresh_async(progress_callback=metadata_progress, force=True)
 
         #
         # we will now prompt the user with an interactive file dialog so they
@@ -337,7 +344,8 @@ class LighthouseCore(object):
         # background while the user is selecting which coverage files to load
         #
 
-        future = lctx.metadata.refresh_async(progress_callback=metadata_progress)
+        # See note in interactive_load_batch() regarding force=True.
+        future = lctx.metadata.refresh_async(progress_callback=metadata_progress, force=True)
 
         #
         # we will now prompt the user with an interactive file dialog so they

@@ -280,7 +280,14 @@ class DatabaseCoverage(object):
         #
 
         elif rebase_offset:
-            self._hitmap = { (address + rebase_offset): hits for address, hits in iteritems(self._hitmap) }
+            #
+            # NOTE:
+            #   self._hitmap is expected to behave like a Counter (defaulting
+            #   missing keys to 0). Replacing it with a plain dict on rebase
+            #   can later trigger KeyError in add/subtract operations.
+            #
+            rebased = { (address + rebase_offset): hits for address, hits in iteritems(self._hitmap) }
+            self._hitmap = collections.Counter(rebased)
             self._imagebase = self._metadata.imagebase
 
         #
